@@ -1,0 +1,63 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+
+<h1>Articles</h1>
+
+<a class="btn btn-sm btn-success" href="{{ path('articles_new') }}">Create Article</a>
+
+<table class="table table-condensed">
+    <tr>
+        <th>Options</th>
+        <th>Id</th>
+        <th>Title</th>
+        <th>Price</th>
+    </tr>
+    {% for art in articles %}
+    <tr id="row-{{ art.id }}">
+        <td>
+            <a class="btn btn-xs btn-info" href="{{ path('articles_edit', {id: art.id}) }}">Edit</a>
+            <a class="btn btn-xs btn-danger article-remove" href="#" id="art-{{ art.id }}">Delete</a>
+        </td>
+        <td>{{ art.id }}</td>
+        <td>{{ art.name }}</td>
+        <td>{{ art.price }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function(){
+            $('.article-remove').click(function(e){
+                e.preventDefault();
+                if (!confirm('Are you sure you want to delete this ?')) {
+                    return;
+                }
+
+                var productId = $(this).attr('id').replace('art-', '');
+
+                $.ajax({
+                    url: "{{ path('articles_remove') }}",
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        id: productId
+                    }
+                }).done(function(response){
+                    if (response.code === 200) {
+                        $('#row-' + productId).css({
+                            'background': 'red',
+                            'color': 'white'
+                        }).fadeOut('slow');
+
+                    } else {
+                        alert(response.message);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

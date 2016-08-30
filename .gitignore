@@ -15,3 +15,5 @@
 /vendor/
 /web/bundles/
 _vm/
+.idea/
+nginx-*

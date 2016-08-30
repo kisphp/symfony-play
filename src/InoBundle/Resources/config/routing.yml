@@ -1,0 +1,25 @@
+ino_homepage:
+    path: /
+    defaults: { _controller: InoBundle:Default:index }
+
+ino_contact:
+    path: /contact
+    defaults: { _controller: InoBundle:Default:contact }
+
+
+articles:
+    path: /articles
+    defaults: { _controller: InoBundle:Article:index }
+
+articles_new:
+    path: /article/new
+    defaults: { _controller: InoBundle:Article:edit, id: 0 }
+
+articles_edit:
+    path: /article/edit/{id}
+    defaults: { _controller: InoBundle:Article:edit }
+
+articles_remove:
+    path: /article/remove
+    defaults: { _controller: InoBundle:Article:delete }
+
