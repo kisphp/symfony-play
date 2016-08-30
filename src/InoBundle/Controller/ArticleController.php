@@ -2,7 +2,6 @@
 
 namespace InoBundle\Controller;
 
-use InoBundle\Entity\Product;
 use InoBundle\Forms\ProductForm;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -17,10 +16,7 @@ class ArticleController extends Controller
 {
     public function indexAction()
     {
-        $articles = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('InoBundle:Product')
-            ->findAll()
-        ;
+        $articles = $this->get('model.product')->getAllProducts();
 
         return [
             'articles' => $articles,
@@ -29,23 +25,15 @@ class ArticleController extends Controller
 
     public function editAction(Request $request, $id)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $entity = new Product();
-
-        if ($id > 0) {
-            $entity = $em->getRepository('InoBundle:Product')
-                ->find($id)
-            ;
-        }
+        $productModel = $this->get('model.product');
+        $entity = $productModel->getByIdOrEmpty($id);
 
         $form = $this->createForm(ProductForm::class, $entity);
         $form->handleRequest($request);
 
 
         if ($form->isValid()) {
-            $em->persist($form->getData());
-            $em->flush();
-
+            $entity = $productModel->save($form->getData());
             $this->addFlash('success', 'Product created');
 
             return $this->redirect(
@@ -63,15 +51,11 @@ class ArticleController extends Controller
     public function deleteAction(Request $request)
     {
         $id = $request->request->getInt('id');
-
-        $em = $this->get('doctrine.orm.entity_manager');
+        $productModel = $this->get('model.product');
 
         if ($id > 0) {
-            $entity = $em->getRepository('InoBundle:Product')
-                ->find($id)
-            ;
-            $em->remove($entity);
-            $em->flush();
+            $entity = $productModel->find($id);
+            $productModel->delete($entity);
 
             return new JsonResponse([
                 'code' => Response::HTTP_OK
